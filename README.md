@@ -23,20 +23,20 @@ Docker and Terraform have builds available for mac, linux, and windows.
 		```
 		$ terraform init
 		Initializing provider plugins...
-- Checking for available provider plugins on https://releases.hashicorp.com...
-- Downloading plugin for provider "docker" (1.0.1)...
+    Checking for available provider plugins on https://releases.hashicorp.com...
+    Downloading plugin for provider "docker" (1.0.1)...
 
-...
+    <output abbreviated> 
 
-* provider.docker: version = "~> 1.0"
+    * provider.docker: version = "~> 1.0"
 
-Terraform has been successfully initialized!
+    Terraform has been successfully initialized!
 
-... 
+    <output abbreviated> 
 
-If you ever set or change modules or backend configuration for Terraform,
-rerun this command to reinitialize your working directory. If you forget, other
-commands will detect it and remind you to do so if necessary.
+    If you ever set or change modules or backend configuration for Terraform,
+    rerun this command to reinitialize your working directory. If you forget, other
+    commands will detect it and remind you to do so if necessary.
 ```
 		- terraform apply
 		- then go hack on ansible!
