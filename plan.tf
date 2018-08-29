@@ -3,11 +3,15 @@ provider "docker" {
 	host = "unix:///var/run/docker.sock" 
 }
 
-resource "docker_container" "foo" {
-	image = "${docker_image.ubuntu.latest}"
-	name = "foo"
+resource "docker_container" "webserver" {
+	image = "${docker_image.nginx.latest}"
+	name = "webserver"
+    ports {
+        internal = 80
+        external = 8080
+    }
 }
 
-resource "docker_image" "ubuntu" {
-	name = "ubuntu:latest"
+resource "docker_image" "nginx" {
+	name = "nginx:latest"
 }
