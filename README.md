@@ -1,6 +1,17 @@
+I'll do an ~10-15 minute talk introducing infrastructure as code where we will cover:
+- what are infrastructure templating and configuration management
+- an example scenario for how to use tooling to build and configure a webserver
+- an intro to Terraform
+- an overview of the exercise (currently writing this up, will give you a link to a repo by friday!)
+Then we'll go through the exercise together. By the end of the study session, you will hopefully have a local docker container configured and built by Terraform.
+To run the exercise, you will need to install
+[docker](https://docs.docker.com/install/#supported-platforms) and
+[Terraform](https://www.terraform.io/intro/getting-started/install.html)
+Docker and Terraform have builds available for mac, linux, and windows.
+
 # TODO:
 - create a shared ssh key (note why this is insecure)
-- writeup instructions for python/virtualenv/ansible and terraform install
+- ~~writeup instructions for python/virtualenv/ansible and terraform installi~~
 - (or just create a vm???)
 - install terraform
 	- terraform apply will do:
