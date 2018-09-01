@@ -6,6 +6,8 @@ provider "docker" {
 resource "docker_container" "webserver" {
 	image = "${docker_image.nginx.latest}"
 	name = "webserver"
+    restart = "on-failure"
+    must_run = "true" 
     ports {
         internal = 80
         external = 8080
@@ -15,3 +17,4 @@ resource "docker_container" "webserver" {
 resource "docker_image" "nginx" {
 	name = "nginx:latest"
 }
+
