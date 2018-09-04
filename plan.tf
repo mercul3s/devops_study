@@ -1,6 +1,7 @@
 # prompt for your aws iam username and account key path.
 
 variable "user_name" {}
+
 variable "region" {
     default = "us-west-2"
 }
@@ -9,32 +10,42 @@ provider "aws" {
     region = "${var.region}"
 }
 
-resource "aws_security_group" "instance" {
+data "aws_canonical_user_id" "current" {}
+
+locals {
+  "account_name" = "${var.user_name}"
+}
+
+resource "aws_security_group" "webserver" {
   
   name = "devops-study"
-    // ssh access
+  description = "Allow inbound traffic"
+  
+  // ssh access
   ingress {
       from_port   = 22
       to_port     = 22
       protocol    = "TCP"
       cidr_blocks = ["0.0.0.0/0"]
+      ipv6_cidr_blocks = ["::/0"]
       description = "ssh access"
   }
   
   // web access
   ingress {
       from_port   = 80 
-      to_port     = 8080 
+      to_port     = 8000 
       protocol    = "TCP"
       cidr_blocks = ["0.0.0.0/0"]
-      description = "ssh access"
+      ipv6_cidr_blocks = ["::/0"]
+      description = "http access"
   }
 }
 
 resource "aws_instance" "webserver" {
     ami           = "ami-51537029"
     instance_type = "t2.micro"
-    iam_instance_profile = "${var.user_name}" 
+    iam_instance_profile = "devops-study" 
     associate_public_ip_address = true
     key_name = "${var.user_name}" 
     
@@ -44,15 +55,17 @@ resource "aws_instance" "webserver" {
     }
    
     tags {
-        Name = "${var.user_name}.devops-study"
+        Name = "${local.account_name}.devops-study"
     }
+    
+    vpc_security_group_ids = ["${aws_security_group.webserver.id}"]
 }
 
 resource "aws_launch_configuration" "provisioner" {
   image_id        = "ami-51537029"
   instance_type   = "t2.micro"
-  key_name = "${var.user_name}"
-  security_groups = ["${aws_security_group.instance.id}"]
+  key_name = "${local.account_name}"
+  security_groups = ["${aws_security_group.webserver.id}"]
   user_data       = "${file("provision_script.sh")}"
 
   lifecycle {
