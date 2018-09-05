@@ -36,7 +36,7 @@ resource "aws_security_group" "webserver" {
   // web access
   ingress {
       from_port   = 80 
-      to_port     = 8000 
+      to_port     = 80 
       protocol    = "TCP"
       cidr_blocks = ["0.0.0.0/0"]
       ipv6_cidr_blocks = ["::/0"]
@@ -89,7 +89,7 @@ resource "null_resource" "provision_docker" {
             "apt-cache policy docker-ce",
             "sudo apt-get install -y docker.io",
             "sudo docker pull mercul3s/devops-study:latest",
-            "sudo docker run -d -p 8000:8000 mercul3s/devops-study:latest"
+            "sudo docker run -d -p 80:8000 mercul3s/devops-study:latest"
         ]
     }
 }
