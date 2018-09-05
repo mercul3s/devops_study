@@ -4,8 +4,9 @@ FROM golang:alpine
 # WORKDIR is the directory that will host our application. It is created if it
 # doesn't already exist.
 WORKDIR /app
+
 # ADD copies the contents of the current directory to our working directory.
-ADD . /app
+ADD ./app /app
 
 # compile the application
 RUN go build -o main .
