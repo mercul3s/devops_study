@@ -1,6 +1,7 @@
 # prompt for your aws iam username and account key path.
 
 variable "user_name" {}
+variable "key_path" {}
 
 variable "region" {
     default = "us-west-2"
@@ -14,6 +15,7 @@ data "aws_canonical_user_id" "current" {}
 
 locals {
   "account_name" = "${var.user_name}"
+  "private_key" = "${var.key_path}"
 }
 
 resource "aws_security_group" "webserver" {
@@ -40,6 +42,15 @@ resource "aws_security_group" "webserver" {
       ipv6_cidr_blocks = ["::/0"]
       description = "http access"
   }
+
+  // route out to the internet
+  egress {
+    from_port = 0
+    to_port = 0
+    protocol = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+  }
 }
 
 resource "aws_instance" "webserver" {
@@ -61,37 +72,24 @@ resource "aws_instance" "webserver" {
     vpc_security_group_ids = ["${aws_security_group.webserver.id}"]
 }
 
-resource "aws_launch_configuration" "provisioner" {
-  image_id        = "ami-51537029"
-  instance_type   = "t2.micro"
-  key_name = "${local.account_name}"
-  security_groups = ["${aws_security_group.webserver.id}"]
-  user_data       = "${file("provision_script.sh")}"
+resource "null_resource" "provision_docker" {
+    connection {
+        host = "${aws_instance.webserver.public_ip}"
+        type = "ssh"
+        user = "ubuntu"
+        agent_identity = "${local.account_name}"
+        private_key = "${file("${local.private_key}")}"
+    }
 
-  lifecycle {
-    create_before_destroy = true
-  }
-}
-
-/*
-provider "docker" {
-# this is the hostname of the docker service running on your machine
-	host = "unix:///var/run/docker.sock" 
-}
-
-resource "docker_container" "webserver" {
-	image = "${docker_image.study_app.latest}"
-	name = "webserver"
-    restart = "on-failure"
-    must_run = "true" 
-    ports {
-        internal = 8000
-        external = 80
+    provisioner "remote-exec" {
+        inline = [
+            "curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -",
+            "sudo add-apt-repository 'deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable'",
+            "sudo apt-get update",
+            "apt-cache policy docker-ce",
+            "sudo apt-get install -y docker.io",
+            "sudo docker pull mercul3s/devops-study:latest",
+            "sudo docker run -d -p 8000:8000 mercul3s/devops-study:latest"
+        ]
     }
 }
-
-
-resource "docker_image" "study_app" {
-	name = "mercul3s/devops-study:latest"
-}
-*/
